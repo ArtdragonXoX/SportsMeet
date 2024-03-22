@@ -1,86 +1,91 @@
 #include "List.h"
 
-ListNode* InitListNode()
+ListNode *InitList()
 {
-    ListNode* node=(ListNode*)malloc(sizeof(ListNode));
-    node->serial=0;
-    node->data=NULL;
-    node->nextNode=NULL;
+    ListNode *node = (ListNode *)malloc(sizeof(ListNode));
+    node->data = NULL;
+    node->nextNode = NULL;
     return node;
 }
 
-List *InitList()
+ListNode *GetListNode(ListNode *listNode, int serial)
 {
-    List* list=(List*)malloc(sizeof(List));
-    list->headNode=NULL;
-    list->serial=0;
-    return list;
-}
-
-ListNode *GetListNode(List *list, int serial)
-{
-    ListNode* priorNode=GetPriorListNode(list,serial);
-    if(priorNode==NULL)
+    if (serial < 0)
         return NULL;
-    return priorNode->nextNode;
-}
-
-ListNode *GetPriorListNode(List *list, int serial)
-{
-    if(serial>list->serial)
-        return NULL;
-    ListNode* nowNode=list->headNode;
-    while(nowNode->nextNode!=NULL&&nowNode->nextNode->serial!=serial)
-        nowNode=nowNode->nextNode;
-    if(nowNode->nextNode==NULL)
-        return NULL;
-    return nowNode;
-}
-
-int InsertNextListData(List *list, void *data)
-{
-    ListNode* node=InitListNode();
-    node->data=data;
-    return InsertNextListNode(list,node);
-}
-
-int InsertNextListNode(List *list, ListNode *node)
-{
-    if(list==NULL||node==NULL)
-        return 0;
-    if(list->headNode==NULL)
+    if(serial==0)
+        return listNode;
+    ListNode *node = listNode->nextNode;
+    for (int i = 1; i < serial; ++i)
     {
-        list->headNode=node;
-        node->serial=++list->serial;
+        node = node->nextNode;
+        if (node == NULL)
+            break;
+    }
+    return node;
+}
+
+void *GetListNodeData(ListNode *list, int serial)
+{
+    return GetListNode(list,serial)->data;
+}
+
+ListNode *GetPriorListNode(ListNode *listNode, int serial)
+{
+    return GetListNode(listNode, serial - 1);
+}
+
+int InsertNextListData(ListNode *listNode, void *data)
+{
+    ListNode *newNode = InitList();
+    newNode->data = data;
+    if (listNode->nextNode == NULL)
+    {
+        listNode->nextNode = newNode;
         return 1;
     }
-    ListNode* nowNode=list->headNode;
-    while(nowNode->nextNode!=NULL)
-        nowNode=nowNode->nextNode;
-    nowNode->nextNode=node;
+    ListNode *node = listNode->nextNode;
+    while (node->nextNode != NULL)
+        node = node->nextNode;
+    node->nextNode = newNode;
     return 1;
 }
 
-void *DeleteListNode(List *list,int serial)
+void DeleteListNode(ListNode *listNode, int serial, DeleteFun_t fun_t)
 {
-    ListNode* priorNode=GetPriorListNode(list,serial);
-    if(priorNode==NULL)
-        return NULL;
-    ListNode* deleteNode=priorNode->nextNode;
-    void* data=deleteNode;
-    priorNode->nextNode=deleteNode->nextNode;
+    ListNode *priorNode = GetPriorListNode(listNode, serial);
+    if (priorNode == NULL)
+        return;
+    ListNode *deleteNode = priorNode->nextNode;
+    void *data = deleteNode->data;
+    priorNode->nextNode = deleteNode->nextNode;
     free(deleteNode);
-    return data;
+    fun_t(data);
 }
 
-int NumberOfList(List *list)
+int NumberOfList(ListNode *listNode)
 {
-    int res=0;
-    ListNode* nowNode=list->headNode;
-    while(nowNode!=NULL)
+    int res = 0;
+    ListNode *nowNode = listNode->nextNode;
+    while (nowNode != NULL)
     {
-        nowNode=nowNode->nextNode;
+        nowNode = nowNode->nextNode;
         ++res;
     }
     return res;
+}
+
+int SearchData(ListNode *list, void *data, SearchFun_t fun_t)
+{
+    int res = 1;
+    ListNode *node = list->nextNode;
+    while (node != NULL)
+    {
+        if (fun_t(node->data,data))
+        {
+            return res;
+        }
+        node = node->nextNode;
+        ++res;
+    }
+    return -1;
 }

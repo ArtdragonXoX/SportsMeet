@@ -4,17 +4,17 @@
 
 typedef struct
 {
-    int serial;
-    void* data;
-    ListNode* nextNode;
+    ListNode* node;
 }Iterator;
 
-Iterator* InitIterator(List* list);
+//迭代器初始化
+Iterator* InitIterator(ListNode* list);
 
+//迭代器指向下一个节点
 void IteratorNextNode(Iterator* it);
 
+//获得迭代器指向节点的数据
 void* IteratorData(Iterator* it);
 
-int IteratorSerial(Iterator* it);
-
+//释放迭代器
 void FreeIterator(Iterator* it);

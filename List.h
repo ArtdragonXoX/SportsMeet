@@ -2,31 +2,35 @@
 #include <stdio.h>
 #include <malloc.h>
 
-typedef struct
+typedef void (*DeleteFun_t)(void*);
+
+typedef int (*SearchFun_t)(void*,void*);
+
+typedef struct _ListNode
 {
-    int serial;
     void* data;
-    ListNode* nextNode;
+    struct _ListNode* nextNode;
 }ListNode;
 
-typedef struct
-{
-    int serial;
-    ListNode* headNode;
-}List;
+//链表初始化
+ListNode* InitList();
 
-ListNode* InitListNode();
+//获得索引为serial的节点
+ListNode* GetListNode(ListNode* list,int serial);
 
-List* InitList();
+void* GetListNodeData(ListNode* list,int serial);
 
-ListNode* GetListNode(List* list,int serial);
+//获得索引为serial的前置节点
+ListNode* GetPriorListNode(ListNode* list,int serial);
 
-ListNode* GetPriorListNode(List* list,int serial);
+//插入数据
+int InsertNextListData(ListNode*list, void* data);
 
-int InsertNextListData(List *list, void* data);
+//删除数据，需传入删除函数
+void DeleteListNode(ListNode* list, int serial, DeleteFun_t fun_t);
 
-int InsertNextListNode(List* list,ListNode* node);
+//获得节点数
+int NumberOfList(ListNode* list);
 
-void* DeleteListNode(List* list,int serial);
-
-int NumberOfList(List* list);
+//寻找数据，返回索引，需传入寻找函数
+int SearchData(ListNode* list,void* data,SearchFun_t fun_t);
